@@ -1,0 +1,60 @@
+@CHARSET "UTF-8";
+/**
+ * @package Football
+ */
+
+.fp_table {
+	text-align: left;
+	border: 0;
+	border-collapse: collapse;
+	margin: 1px;
+	background:#C0C0C0;
+	width:100%;
+}
+
+.fp_table th {
+	color:white;
+	padding: 1px 0.5em 1px 4px;
+	margin:0;
+	border-right: 1px solid white;
+	border-bottom: 1px solid white;
+	background: #606060;
+}
+
+.fp_table td {
+	padding: 1px 0.5em 1px 4px;
+	border: 0;
+	margin: 0;
+	border-right: 1px solid white;
+	border-bottom: 1px solid white;
+	vertical-align: middle;
+}
+
+.fp_table td img {
+	display:inline;
+}
+
+.fp_flag {
+	padding:1px;
+	border: 1px solid gray;
+}
+
+table.knockout {
+	margin: 1em 2em 1em 1em !important;
+}
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table.scores strong, b {
+	font-weight: bold;
+}
+
+.fp-overview .table, .fp-overview .versions {
+	margin: 11px;
+}

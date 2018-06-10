@@ -1,0 +1,206 @@
+@CHARSET "UTF-8";
+
+/**
+ * @package Football
+ * @author Bigtonni
+ */
+
+/* Countdown clock */
+.fp_clock {
+	text-align:center;
+}
+
+.updated, .error {
+	border-style:solid;
+	border-width:1px;
+	margin:10px 0 5px 0;
+	padding:0.5em 0 0 1em;
+}
+
+.error {
+	background-color:#FFEBE8;
+	border-color:#CC0000;
+}
+
+.updated {
+	background-color:#FFFFE0;
+	border-color:#E6DB55;
+}
+
+.message {
+	font-weight:bold;
+	text-align: center;
+}
+
+.tzClient {
+	font-weight:bold;
+}
+
+/*
+ * Groups results table
+ */
+ 
+table.group {
+	width:100%;
+	border-collapse: collapse;
+}
+
+table.group tr.fp-row {
+	line-height: 1.7em;
+}
+
+table.group th.column-goal {
+	width:9%;
+	text-align: center;
+	padding-right: 0.5em;
+	vertical-align: middle;
+}
+
+td.column-goal {
+	text-align: center;
+	padding-right: 0.5em;
+}
+
+table.group td.column-user {
+	text-align: left;
+	padding-left: 0.5em;
+}
+
+table.group th.column-team {
+	vertical-align: middle;
+	text-align:left;
+}
+
+table.group .column-score {
+	text-align:center;
+}
+
+table.group img {
+	vertical-align: middle;
+}
+
+table.group tr.row-header {
+	line-height:1.5em;
+	background-color: #B3B3B3;
+	color:#000;	
+}
+
+table.group .column-points {
+	text-align:center;
+	padding-right: 0.5em;
+}
+
+table.group td.l, table.group th.l {
+	text-align:left;
+}
+table.group td.r, table.group th.r {
+	text-align:right;
+}
+
+/* Zebra */
+table.group tr.alt td, table.group tr.alt th {
+	vertical-align: middle;
+	border-bottom:1px solid #CCCCCE;
+	background:#CCCCCE none repeat scroll 0 0;
+	color:#000;	
+}
+table.group tr.even td, table.group tr.even th {
+	vertical-align: middle;
+	border-bottom:1px solid #CCCCCE;
+	background:#FFFFFF none repeat scroll 0 0;
+	color:#000;
+}
+
+
+/*
+ * Predictions tables
+ */
+table.predictor {
+	width:100%;
+}
+
+table.predictor td.sep {
+	border-bottom: 1px solid black;
+	text-align: center;
+}
+
+table.predictor td.l {
+	width:35%;
+	text-align:left;
+	padding-left:1em;
+	vertical-align: middle;
+}
+
+table.predictor td.cl {
+	width:10%;
+	text-align: center;
+}
+
+table.predictor td.c {
+	width:5%;
+	text-align: center;
+}
+
+table.predictor td.cr {
+	width:10%;
+	text-align: center;
+}
+
+table.predictor td.cl input {
+	width:2.5em;
+	text-align:center;
+	font-weight: bold;
+}
+
+table.predictor td.cr input {
+	width:2.5em;
+	text-align:center;
+	font-weight: bold;
+}
+
+table.predictor td.r {
+	width:35%;
+	text-align:right;
+	padding-right:1em;
+	vertical-align: middle;
+}
+
+table.predictor img {
+	vertical-align: middle;
+}
+
+table, th, td {
+	border: 0;
+}
+
+.entry-content td {
+	padding: 2px;
+	vertical-align: middle;
+}
+
+table.knockout {
+	margin: 1em 0;
+	font-size: 80%;
+	width:920px;
+}
+
+.entry-content p {
+	text-align:justify;
+}
+
+.widget h3 {
+	margin: 0 0 12px;
+}
+
+.column-team a {
+	color: #24890d;
+}
+
+.football_flag {
+	border:1px solid gray;
+}
+
+.message p {
+	text-align: center;
+	margin-bottom:10px;
+}
