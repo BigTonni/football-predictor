@@ -12,8 +12,8 @@ if (!defined('ABSPATH')) {
  */
 class Football {
 	
-	var $prefix = 'fp_';
-	
+	public $prefix = FP_PREFIX;
+    
 	/**
 	 * error handling
 	 *
@@ -28,8 +28,7 @@ class Football {
 	 */
 	private $message = null;
 	
-	function __construct() {
-        
+	function __construct() {     
 		global $wpdb;
 		if (defined('WPLANG') && WPLANG) {
 			$wpdb->query($wpdb->prepare('SET lc_time_names = %s', WPLANG));
@@ -43,11 +42,10 @@ class Football {
 	}
         	
 	function connect_resources() {
-                wp_enqueue_style($this->prefix.'css', WP_PLUGIN_URL . '/' . FP_PD . '/css/style.css');
-		wp_enqueue_script($this->prefix . 'js', WP_PLUGIN_URL . '/' . FP_PD.'/js/fp.js', array( 'jquery' ));
-                wp_localize_script( $this->prefix . 'js', 'FPScript', array(
-                            'ajax_url'  => admin_url( 'admin-ajax.php' ),
-//                            'login_nonce' => wp_create_nonce( 'fp_login_nonce_field' ),
+                wp_enqueue_style(FP_PREFIX.'css', WP_PLUGIN_URL . '/' . FP_PD . '/css/style.css');
+		wp_enqueue_script(FP_PREFIX . 'js', WP_PLUGIN_URL . '/' . FP_PD.'/js/fp.js', array( 'jquery' ));
+                wp_localize_script(FP_PREFIX . 'js', 'FPScript', array(
+                            'ajax_url'  => admin_url( 'admin-ajax.php' )
                     )
                 ); 
 
@@ -144,14 +142,6 @@ class Football {
 		}
 	}
 	
-	function debug($var, $echo = true) {
-		$output = "<pre>";
-		$output .= print_r($var, true);
-		$output .= "</pre>";
-		if ($echo) echo $output;
-		return $output;
-	}
-	
 	/**
 	 * Clean the input string of dangerous input.
 	 * @param $str input string
@@ -172,7 +162,7 @@ class Football {
 	}
 	
 	function flag($country) {
-		$class = ($country != 'xxx' ? $this->prefix.'flag' : '');
+		$class = ($country != 'xxx' ? FP_PREFIX.'flag' : '');
 		return '<img alt="" class="'.$class.'" src="'.WP_PLUGIN_URL.'/'.FP_PD.'/images/'.strtolower($country).'.png" />';
 	}
 	
@@ -252,38 +242,4 @@ class Football {
 	function format_date($mysql_date) {
 		return mysql2date(get_option('date_format') . ' ' . get_option('time_format'), $mysql_date);
 	}
-        
-        
-        /**
-        * Do things on plugin uninstall.
-        */
-        public function uninstall() {
-                if (!current_user_can('activate_plugins'))
-                    return;
-                check_admin_referer('bulk-plugins');
-
-                if (__FILE__ != WP_UNINSTALL_PLUGIN)
-                    return;
-
-                global $wpdb;
-
-                $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}fp_stage");
-                $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}fp_team");
-                $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}fp_venue");
-                $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}fp_match");
-                $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}fp_prediction");
-
-                delete_option( 'fp_db_version' );
-                delete_option( 'fp_promo_link' );
-                delete_option( 'fp_group_stats' );
-                delete_option( 'fp_scoring' );
-                delete_option( 'fp_countdown_format' );
-                delete_option( 'fp_browser_locale' );
-
-                $roles = array("subscriber", "contributor", "author", "editor", "administrator");
-                foreach ($roles as $role) {
-                        $arole = get_role($role);
-                        $arole->remove_cap('fp_manager');
-                }
-        }
 }

@@ -3,7 +3,7 @@
  * Plugin Name: Football Predictor
  * Plugin URI: https://wordpress.org/plugins/football-predictor/
  * Description: To manage and perform a marvel football competition for the FIFA World Cup 2018.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Anton Shulga
  * Author URI: https://github.com/BigTonni
  * Text Domain: football-predictor
@@ -40,13 +40,17 @@ if (!defined('FP_ABSPATH')) {
     define('FP_ABSPATH', dirname(FP_FILE) . '/');
 }
 if (!defined('FP_VERSION')) {
-    define('FP_VERSION', '1.0.1');
+    define('FP_VERSION', '1.0.2');
+}
+if (!defined('FP_PREFIX')) {
+    define('FP_PREFIX', 'fp_');
 }
 
 if (!class_exists('Football_Start')) {
-    register_uninstall_hook(__FILE__, array('Football', 'uninstall'));
 
     class Football_Start {
+	
+	public $prefix = FP_PREFIX;
 
         private static $instance = null;
 
@@ -123,21 +127,10 @@ if (!class_exists('Football_Start')) {
          * Create database structure
          */
         function activate() {
-            return true;
 
             require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
             global $wpdb;
-
-            $installed_ver = get_option($this->prefix . 'db_version');
-            if ($installed_ver == '1.1' || $installed_ver == '1.0') {
-                // Remove old database structure from beta version
-                $wpdb->query("DROP TABLE {$wpdb->prefix}{$this->prefix}stage");
-                $wpdb->query("DROP TABLE {$wpdb->prefix}{$this->prefix}team");
-                $wpdb->query("DROP TABLE {$wpdb->prefix}{$this->prefix}venue");
-                $wpdb->query("DROP TABLE {$wpdb->prefix}{$this->prefix}match");
-                $wpdb->query("DROP TABLE {$wpdb->prefix}{$this->prefix}prediction");
-            }
 
             $charset_collate = '';
             if ($wpdb->has_cap('collation')) {
@@ -148,7 +141,7 @@ if (!class_exists('Football_Start')) {
             }
 
             // Plugin database table version
-            $db_version = "1.8";
+            $db_version = "1.0";
 
             $sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}{$this->prefix}match` (
 		  `match_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -217,42 +210,7 @@ if (!class_exists('Football_Start')) {
 		  PRIMARY KEY (`venue_id`)
 		) $charset_collate";
             $wpdb->query($sql);
-
-            // Installed plugin database table version
-            $installed_ver = get_option($this->prefix . 'db_version');
-
-            // If the database has changed, update the structure while preserving data
-            if (empty($installed_ver) || $db_version != $installed_ver) {
-
-                if (!empty($installed_ver) && $installed_ver == "1.2") {
-                    $sql = "ALTER TABLE  `{$wpdb->prefix}{$this->prefix}prediction` ADD UNIQUE  `idx_pred` (  `user_id` ,  `match_id` )";
-                    $wpdb->query($sql);
-                    $sql = "ALTER TABLE  `{$wpdb->prefix}{$this->prefix}match` ADD  `scored` BOOL NOT NULL DEFAULT  '0' AFTER  `stage_id`";
-                    $wpdb->query($sql);
-                    update_option($this->prefix . 'db_version', '1.3');
-                }
-
-                // Add group_order to teams table to manually sort group tables in the event of a tie.
-                if (!empty($installed_ver) && $installed_ver == "1.3") {
-                    $sql = "ALTER TABLE  `{$wpdb->prefix}{$this->prefix}team` ADD `group_order` INT(11) NOT NULL DEFAULT 0 AFTER  `team_url`";
-                    $wpdb->query($sql);
-                    update_option($this->prefix . 'db_version', '1.4');
-                }
-
-                // Add tz_offset to venues table to show match times in local time.
-                if (!empty($installed_ver) && $installed_ver == "1.4") {
-                    $sql = "ALTER TABLE  `{$wpdb->prefix}{$this->prefix}venue` ADD `tz_offset` INT(11) NOT NULL DEFAULT 0 AFTER  `stadium`";
-                    $wpdb->query($sql);
-                    update_option($this->prefix . 'db_version', '1.5');
-                }
-
-                // Remove auto update from prediction table.
-                if (!empty($installed_ver) && $installed_ver == "1.5") {
-                    $sql = "ALTER TABLE  `{$wpdb->prefix}{$this->prefix}prediction` CHANGE  `wwhen`  `wwhen` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP";
-                    $wpdb->query($sql);
-                    update_option($this->prefix . 'db_version', '1.8');
-                }
-            }
+            
             update_option($this->prefix . 'db_version', $db_version);
 
             add_option($this->prefix . 'nag', 10);

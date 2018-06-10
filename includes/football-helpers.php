@@ -12,7 +12,6 @@ if(isset($_GET['fp']) && sanitize_text_field($_GET['fp']) == 'predictions') {
 }
 
 function fp_template_scores_content($match_id = NULL, $limit = NULL, $user_id = -1) {
-	
 	global $wpdb;
 	
 	require_once FP_ABSPATH.'includes/class-fp-reports.php';
@@ -25,7 +24,6 @@ function fp_template_scores_content($match_id = NULL, $limit = NULL, $user_id = 
 }
 
 function fp_template_predictions_content($user = NULL, $schedule_id = NULL, $month = NULL) {
-	
 	global $wpdb;
 	
 	require_once FP_ABSPATH.'includes/class-fp-reports.php';

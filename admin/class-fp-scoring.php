@@ -6,8 +6,8 @@
  
 class FootballScoring extends FootballAdmin {
 	
-	var $tab = 3;
-	var $default = array('exact'=>3, 'win'=>1, 'draw'=>3, 'bonus_goals'=>1, 'bonus_goal_difference'=>0);
+	public $tab = 3;
+	public $default = array('exact'=>3, 'win'=>1, 'draw'=>3, 'bonus_goals'=>1, 'bonus_goal_difference'=>0);
 	
 	/**
 	 * Constructor

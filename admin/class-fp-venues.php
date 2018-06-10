@@ -8,7 +8,7 @@
  
 class FootballVenues extends FootballAdmin {
 	
-	var $tab;
+	public $tab;
 	
 	/**
 	 * Constructor

@@ -9,7 +9,7 @@
 
 class FootballMatches extends FootballAdmin {
 	
-	var $tab;
+	public $tab;
 	
 	/**
 	 * Constructor
@@ -183,26 +183,21 @@ class FootballMatches extends FootballAdmin {
 					<td><input <?php echo ($is_result ? 'checked' : ''); ?> type="checkbox" name="is_result" value="1" /></td>
 				</tr>
 			</table>
-<?php 
-			if  ($match_id != -1) {
-?>
-			<input type="hidden" value="<?php echo $match_id; ?>" name="match_id"></input>
-			<p class="submit">
-				<input type="submit" name="<?php echo $this->prefix;?>modifyMatch" value="<?php _e( 'Modify Match', FP_PD ) ?>" class="button-primary" />
-				<input type="submit" name="<?php echo $this->prefix;?>modifyMatchCancel" value="<?php _e( 'Cancel', FP_PD ) ?>" class="button" />
-			</p>
-<?php 
-			} else {
-?>
-			<p class="submit">
-				<input type="submit" name="<?php echo $this->prefix;?>addMatch" value="<?php _e( 'Add Match', FP_PD ) ?>" class="button-primary" />
-			</p>
-<?php 
-			}
-?>
+                        <?php 
+			if  ($match_id != -1) { ?>
+                            <input type="hidden" value="<?php echo $match_id; ?>" name="match_id"></input>
+                            <p class="submit">
+                                    <input type="submit" name="<?php echo $this->prefix;?>modifyMatch" value="<?php _e( 'Modify Match', FP_PD ) ?>" class="button-primary" />
+                                    <input type="submit" name="<?php echo $this->prefix;?>modifyMatchCancel" value="<?php _e( 'Cancel', FP_PD ) ?>" class="button" />
+                            </p>
+                        <?php } else { ?>
+                            <p class="submit">
+                                    <input type="submit" name="<?php echo $this->prefix;?>addMatch" value="<?php _e( 'Add Match', FP_PD ) ?>" class="button-primary" />
+                            </p>
+                        <?php } ?>
 		</form>
 		
-<?php 
+                <?php 
 		/**
 		 * Show the current match list in a table
 		 */
@@ -220,8 +215,8 @@ class FootballMatches extends FootballAdmin {
 				ORDER BY
 					sort_order, match_no, kickoff";
 					
-		$result = $wpdb->get_results( $sql , OBJECT );
-?>		
+		$result = $wpdb->get_results( $sql , OBJECT ); ?>
+                
 		<form name="listmatches" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>?page=<?php echo $this->prefix; ?>config">
 			<?php wp_nonce_field( $this->prefix . 'list-matches' ) ?>
 			<table class="<?php echo $this->prefix; ?>table" width="90%">
@@ -244,13 +239,11 @@ class FootballMatches extends FootballAdmin {
 					</tr>
 				</thead>
 				<tbody>
-<?php
-				foreach ($result as $row) {
-?>
+                                <?php
+				foreach ($result as $row) { ?>
 					<tr>
 						<td><input type="checkbox" value="<?php echo $row->match_id; ?>" name ="match_id[<?php echo $row->match_id;?>]"/></td>
-						<td><a title="<?php _e('Modify this match', FP_PD); ?>" 
-					   href="<?php echo $_SERVER['PHP_SELF'] ?>?page=<?php echo $this->prefix; ?>config&amp;modifymatch_id=<?php echo $row->match_id; ?>"><?php echo $row->match_id; ?></a></td>
+						<td><a title="<?php _e('Modify this match', FP_PD); ?>" href="<?php echo $_SERVER['PHP_SELF'] ?>?page=<?php echo $this->prefix; ?>config&amp;modifymatch_id=<?php echo $row->match_id; ?>"><?php echo $row->match_id; ?></a></td>
 						<td><?php echo $this->unclean($row->match_no); ?></td>
 						<td><?php echo $this->unclean($row->venue_name); ?></td>
 						<td><?php echo $this->unclean($row->stage_name); ?></td>
@@ -272,9 +265,7 @@ class FootballMatches extends FootballAdmin {
 						<td><input <?php echo ($row->extra_time ? 'checked' : ''); ?> type="checkbox" disabled /></td>
 						<td><?php echo $row->wwhen; ?></td>
 					</tr>
-<?php
-				}
-?>
+                                <?php } ?>
 				</tbody>
 			</table>
 			<p>
@@ -282,8 +273,7 @@ class FootballMatches extends FootballAdmin {
 			</p>
 		</form>
 	</div>
-<?php
-	}
+        <?php }
 	
 	/**
 	 * Check valid input
@@ -461,5 +451,4 @@ class FootballMatches extends FootballAdmin {
 		return $output;
 	}
 }
-
 ?>

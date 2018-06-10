@@ -11,20 +11,20 @@ if (!defined('ABSPATH')) {
  * Match stats
  */
 class FootballStats {
-	var $team_id = 0;
-	var $played = 0;
-	var $won = 0;
-	var $lost = 0;
-	var $drawn = 0;
-	var $gf = 0;
-	var $ga = 0;
-	var $points = 0;
-	var $stage_id = 0;
-	var $team_country = '';
-	var $team_name = '';
-	var $team_url = '';
-	var $sort_order = 0;
-	var $group_order = 0;
+	public $team_id = 0;
+	public $played = 0;
+	public $won = 0;
+	public $lost = 0;
+	public $drawn = 0;
+	public $gf = 0;
+	public $ga = 0;
+	public $points = 0;
+	public $stage_id = 0;
+	public $team_country = '';
+	public $team_name = '';
+	public $team_url = '';
+	public $sort_order = 0;
+	public $group_order = 0;
 }
 
 class FootballReport extends Football {
@@ -1064,7 +1064,6 @@ EOT;
 					m.kickoff";
 					
 		$toprow = @$wpdb->get_results($wpdb->prepare($sql, $match_id, $match_id), OBJECT_K);
-//		$this->debug($toprow);
 		
 		if ($toprow) {
 			$output .= "<table class='group zebra'>";

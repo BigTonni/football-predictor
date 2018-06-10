@@ -8,7 +8,7 @@
  
 class FootballPredictions extends FootballAdmin {
 	
-	var $tab;
+	public $tab;
 	
 	/*
 	 * Constructor

@@ -8,7 +8,7 @@
  
 class FootballStages extends FootballAdmin {
 	
-	var $tab;
+	public $tab;
 	
 	/**
 	 * Constructor
