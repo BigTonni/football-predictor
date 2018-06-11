@@ -25,7 +25,7 @@ class FootballMatches extends FootballAdmin {
 	function matches() {
 		
 		global $wpdb;
-		
+
 		$match_no = 0;
 		$kickoff = '';
 		$home_team_id = -1;
@@ -103,7 +103,7 @@ class FootballMatches extends FootballAdmin {
 		 * the form.
 		 */
 		if (isset($_GET['modifymatch_id'])) {
-			$match_id = sanitize_text_field($_GET['modifymatch_id']);
+			$match_id = $_GET['modifymatch_id'];
 			$row = $this->get($match_id);
 			if (empty($row)) $match_id = -1;	// Didn't find row. Prevent modification
 			extract($row, EXTR_IF_EXISTS);
@@ -183,7 +183,7 @@ class FootballMatches extends FootballAdmin {
 					<td><input <?php echo ($is_result ? 'checked' : ''); ?> type="checkbox" name="is_result" value="1" /></td>
 				</tr>
 			</table>
-                        <?php 
+                        <?php
 			if  ($match_id != -1) { ?>
                             <input type="hidden" value="<?php echo $match_id; ?>" name="match_id"></input>
                             <p class="submit">
@@ -392,7 +392,7 @@ class FootballMatches extends FootballAdmin {
 	 * Delete row
 	 */
 	private function delete($match_id) {
-		
+	
 		global $wpdb;
 		
 		$sql = "SELECT COUNT(*) FROM {$wpdb->prefix}{$this->prefix}prediction WHERE match_id = %d";

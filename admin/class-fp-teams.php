@@ -77,7 +77,7 @@ class FootballTeams extends FootballAdmin {
 		 * Process GET request to retreive the team details and pre-fill the form.
 		 */
 		if (isset($_GET['modifyteam_id'])) {
-			$team_id = sanitize_text_field($_GET['modifyteam_id']);
+			$team_id = $_GET['modifyteam_id'];
 			$row = $this->get($team_id);
 			if (empty($row)) $team_id = -1;	// Didn't find row. Prevent modification
 			extract($row, EXTR_IF_EXISTS);

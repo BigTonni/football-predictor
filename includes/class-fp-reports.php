@@ -348,8 +348,11 @@ class FootballReport extends Football {
 	/**
 	 * Display group tables.
 	 * 
-	 * $stage 0 == all, or limit to stage_id
-	 * $show_results - if true display match results under group table.
+	 * @param integer $stage - Limit to stage_id (0 == all).
+	 * @param boolean $show_results - If true, display match results under group table.
+	 * @param string $width - Sets a width to display.
+	 * @param string $compact - Show a compact table (for widget)
+	 * @return string
 	 */
 	function group_tables($stage, $show_results, $width='100%', $compact = false) {
 		
@@ -475,18 +478,30 @@ class FootballReport extends Football {
 	}
 	
 	/**
-	 * Match results in a simple table for each stage or team
+	 * Match results in a simple table for each stage or team.
+	 * 
+	 * @param integer $stage - ID of stage or group to show results.
+	 * @param string $width - Sets width to display table.
+	 * @param number $team - ID of team to show the results.
+	 * @param boolean $group - Show only results of group stage.
+	 * @param boolean $kickoff - Display results order by kickoff.
+	 * @return string
 	 */
-	function results($stage, $width="100%", $team = 0) {
+	function results($stage, $width="100%", $team = 0, $group = false, $kickoff = false) {
 		global $wpdb;
 		
 		$locale = get_option($this->prefix.'browser_locale', 1);
+		$separator = get_option($this->prefix.'match_separator', '-');
 		
 		$output = '';
 		$stage_filter = '';
-		if ($stage) $stage_filter = "AND s.stage_id = $stage";
 		$team_filter = '';
+		$group_filter = '';
+		if ($stage) $stage_filter = "AND s.stage_id = $stage";
 		if ($team) $team_filter = "AND (m.home_team_id = $team OR m.away_team_id = $team)";
+		if ($group) $group_filter = ' AND is_group = 1';
+		$sort_order = 'sort_order, kickoff';
+		if ($kickoff) $sort_order = 'kickoff';
 		
 		$sql = "SELECT s.stage_id, match_id, match_no, DATE_ADD(kickoff, INTERVAL v.tz_offset HOUR) AS local_kickoff,
 					h.name AS home_team_name, a.name AS away_team_name,
@@ -504,9 +519,9 @@ class FootballReport extends Football {
 				WHERE
 					m.venue_id = v.venue_id AND m.stage_id = s.stage_id AND
 					m.home_team_id = h.team_id AND m.away_team_id = a.team_id
-					$stage_filter $team_filter
+					$stage_filter $team_filter $group_filter
 				ORDER BY
-					sort_order, kickoff";
+					$sort_order, kickoff, match_no";
 		
 		$result = $wpdb->get_results( $sql , OBJECT );
 		
@@ -595,348 +610,47 @@ class FootballReport extends Football {
 	
 	function away_team($i) {
 		return "<!--TA{$i}-->" . $this->team_name($this->knockout[$i], false, false);
-	}
-	
-	/**
-	 * Display the knockout match tables
-	 */
-	function knockout() {
-		
-		$flag = array('xxx' => '');
-		$this->locale = get_option($this->prefix.'browser_locale', 1);
-		
-		$this->knockout = $this->get_stage2_matches();
-		
-		$output = <<<EOT
-<table cellspacing="0" cellpadding="0" border="0" class="knockout">
-<tbody><tr>
-<td height="5"></td>
-<td bgcolor="#f2f2f2" align="center" style="border: 1px solid rgb(170, 170, 170);" colspan="2">{$this->stage(49)}</td>
-<td colspan="2"></td>
-<td bgcolor="#f2f2f2" align="center" style="border: 1px solid rgb(170, 170, 170);" colspan="2">{$this->stage(57)}</td>
-<td colspan="2"></td>
-<td bgcolor="#f2f2f2" align="center" style="border: 1px solid rgb(170, 170, 170);" colspan="2">{$this->stage(61)}</td>
-<td colspan="2"></td>
-<td bgcolor="#f2f2f2" align="center" style="border: 1px solid rgb(170, 170, 170);" colspan="2">{$this->stage(64)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td width="170">&nbsp;</td>
-<td width="40">&nbsp;</td>
-<td width="10">&nbsp;</td>
-<td width="10">&nbsp;</td>
-<td width="170">&nbsp;</td>
-<td width="40">&nbsp;</td>
-<td width="10">&nbsp;</td>
-<td width="10">&nbsp;</td>
-<td width="170">&nbsp;</td>
-<td width="40">&nbsp;</td>
-<td width="10">&nbsp;</td>
-<td width="10">&nbsp;</td>
-<td width="170">&nbsp;</td>
-<td width="40">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#49 - {$this->venue(49)}</td>
-<td style="border-style: solid; border-color: black; border-width: 0pt 0pt 1px;" rowspan="4">&nbsp;</td>
-<td style="border-style: solid; border-color: black; border-width: 0pt 0pt 1px;" rowspan="7">&nbsp;</td>
-<td rowspan="3" colspan="2"></td>
-<td style="border-style: solid; border-color: black; border-width: 0pt 0pt 1px;" rowspan="7">&nbsp;</td>
-<td style="border-style: solid; border-color: black; border-width: 0pt 0pt 1px;" rowspan="13">&nbsp;</td>
-<td rowspan="9" colspan="2"></td>
-<td style="border-style: solid; border-color: black; border-width: 0pt 0pt 1px;" rowspan="13">&nbsp;</td>
-<td style="border-style: solid; border-color: black; border-width: 0pt 0pt 1px;" rowspan="25">&nbsp;</td>
-<td rowspan="21" colspan="2"></td>
-</tr>
-<tr>
-<td height="5"></td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(49)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(49)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#57 - {$this->venue(57)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(49)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(49)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 3px 1px 0pt;" rowspan="6">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(57)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(57)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#50 - {$this->venue(50)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="12">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(57)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(57)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 3px 1px 0pt;" rowspan="12">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(50)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(50)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="6" colspan="2"></td>
-<td rowspan="2" colspan="2">#61 - {$this->venue(61)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(50)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(50)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="6">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(61)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(61)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#53 - {$this->venue(53)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="24">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(61)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(61)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 3px 1px 0pt;" rowspan="24">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(53)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(53)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#58 - {$this->venue(58)}</td>
-<td rowspan="18" colspan="2"></td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">&nbsp;{$this->away_team(53)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">&nbsp;{$this->away_score(53)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 3px 1px 0pt;" rowspan="6">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(58)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(58)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#54 - {$this->venue(54)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="12">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(58)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(58)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="12">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(54)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">&nbsp;{$this->home_score(54)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="6" colspan="2"></td>
-<td rowspan="2" colspan="2">#64 - {$this->venue(64)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(54)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(54)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="6">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(64)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(64)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#51 - {$this->venue(51)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 0pt;" rowspan="23">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(64)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(64)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(51)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(51)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#59 - {$this->venue(59)}</td>
-<td rowspan="10" colspan="2"></td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(51)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(51)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 3px 1px 0pt;" rowspan="6">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(59)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(59)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#52 - {$this->venue(52)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="12">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(59)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(59)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 3px 1px 0pt;" rowspan="12">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(52)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(52)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="6" colspan="2"></td>
-<td rowspan="2" colspan="2">#62 - {$this->venue(62)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(52)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(52)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 1px;" rowspan="6">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(62)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(62)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#55 - {$this->venue(55)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 0pt;" rowspan="11">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(62)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(62)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 0pt;" rowspan="11">&nbsp;</td>
-<td bgcolor="#f2f2f2" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2" colspan="2">{$this->stage(63)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(55)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(55)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#60 - {$this->venue(60)}</td>
-<td rowspan="9" colspan="2"></td>
-<td rowspan="2" colspan="2">#63 - {$this->venue(63)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(55)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(55)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 3px 1px 0pt;" rowspan="6">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(60)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(60)}</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(63)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(63)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="2" colspan="2">#56 - {$this->venue(56)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 0pt;" rowspan="5">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(60)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(60)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 0pt;" rowspan="5">&nbsp;</td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(63)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(63)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_team(56)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->home_score(56)}</td>
-</tr>
-<tr>
-<td height="5"></td>
-<td rowspan="3" colspan="2"></td>
-<td rowspan="3" colspan="2"></td>
-</tr>
-<tr>
-<td height="5"></td>
-<td bgcolor="#f9f9f9" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_team(56)}</td>
-<td bgcolor="#f9f9f9" align="center" style="border: 1px solid rgb(170, 170, 170);" rowspan="2">{$this->away_score(56)}</td>
-<td style="border-style: solid; border-color: black; border-width: 2px 0pt 0pt;" rowspan="2">&nbsp;</td>
-</tr>
-<tr>
-<td height="5"></td>
-</tr>
-</tbody></table>
-
-EOT;
-		return $output;
-	}
+	}	
 	
 	/**
 	 * Display a ranking table of all predictions for all matches
 	 * 
-	 * @param unknown_type $limit
-	 * @param unknown_type $avatar
-	 * @return unknown_type
+	 * @param integer $limit - Limit the number of users to show.
+	 * @param string $avatar - Show the avatar of player.
+	 * @param string $highlight - Apply CSS formatting to the logged in user.
+	 * @return string
 	 */
-	function user_ranking($limit = 999999, $avatar = false, $highlight = '') {
+	function user_ranking($limit = 999999, $avatar = false, $highlight = '', $stage = 0, $playoff = 0) {
 		global $wpdb;
+//		global $current_user;
 		
 		$output = '';
 		$curr_user_id = -1;
 		
 		if (!empty($highlight) && is_user_logged_in()) {
 			$current_user = wp_get_current_user();
-                
 			$curr_user_id = $current_user->ID;
 		}
-		
 		
 		$output = '';
 		
 		if (!is_numeric($limit)) {
 			$limit = 999999;
 		}
+                
+                $stage_filter = '';
+		if ($playoff) $stage_filter = "AND is_group = 0";
+		if ($stage) $stage_filter = "AND m.stage_id = $stage";
 		
 		$sql = "SELECT SUM(points) AS total, u.display_name, u.ID
 				FROM
 					{$wpdb->prefix}{$this->prefix}prediction p,
-					{$wpdb->users} u
+					{$wpdb->users} u,
+					{$wpdb->prefix}{$this->prefix}match m,
+					{$wpdb->prefix}{$this->prefix}stage s
 				WHERE
-					p.user_id = u.ID
+					p.user_id = u.ID AND p.match_id = m.match_id AND m.stage_id = s.stage_id
+					$stage_filter
 				GROUP BY
 					user_id
 				ORDER BY
@@ -945,7 +659,15 @@ EOT;
 					
 		$result = $wpdb->get_results($wpdb->prepare($sql, $limit));
 		$output .= "<table class='group zebra'><tr class='row-header'><th class='column-user'>".__('User', FP_PD)."</th><th class='column-goal'>".__('Points', FP_PD)."</th><th class='column-goal'>&nbsp;</th></tr>" . PHP_EOL;
-		foreach ($result as $row) {
+		$pos = 1;
+		$count = 1;
+		$oldTotal = -1;
+                foreach ($result as $row) {
+			
+			if($oldTotal > $row->total){
+				$pos = $count;
+			}
+                        
 			if ($row->ID == $curr_user_id) {
 				$style = "style=\"$highlight\"";
 			} else {
@@ -953,11 +675,17 @@ EOT;
 			}
 			$output .= "<tr $style><td class='column-user'>".($avatar ? get_avatar( $row->ID, '16', '', $row->display_name ) : '').' '.$row->display_name."</td><td class='column-goal'>$row->total</td><td class='column-goal'>";
 			
+                        $oldTotal = $row->total;
+                        
 			if (get_option($this->prefix.'user_predictions', 1)) {
+				$stage_link = '';
+				if ($playoff) $stage_link = '&playoff=1';
+				if ($stage) $stage_link = '&stage=1';
 				$output .= "<a class='ranking-link' title='".__('Predictions', FP_PD)."' href=\"".get_option($this->prefix.'user_predictions')."&fp=predictions&user=".$row->ID."\"><img src='". WP_PLUGIN_URL."/".FP_PD ."/images/predictions.png' /></a>";
 			}			
 					
 			$output .= "</td></tr>" . PHP_EOL;
+			$count++;
 		}
 		$output .= "</table>" . PHP_EOL;
 		
@@ -1014,10 +742,13 @@ EOT;
 	/**
 	 * Display the guesses for each match and the points awarded
 	 * 
-	 * @param $match_id  (if -1 all matches)
-	 * @param $limit
+	 * @param integer $match_id - ID of match to show the predictions. -1 == all matches
+	 * @param number $limit - Limit of predictions to show
+	 * @param integer $user_id - ID of player to show the predictions. -1 == all players
+	 * @param string $highlight - Customize CSS of logged in user
+	 * @return string
 	 */
-	function user_scores($match_id, $limit = 999999, $user_id = -1, $highlight = '', $show_all = 0) {
+	function user_scores($match_id, $limit = 999999, $user_id = -1, $highlight = '') {
 		
 		global $wpdb;
 		global $current_user;
@@ -1032,7 +763,7 @@ EOT;
 		$curr_user_id = -1;
 		
 		if (!empty($highlight) && is_user_logged_in()) {
-			get_currentuserinfo();
+			wp_get_current_user();
 			$curr_user_id = $current_user->ID;
 		}
 		
@@ -1042,7 +773,7 @@ EOT;
 		// Show all matches after kickoff expired unless the option 'show predictions' is set
 		$throttle = 'AND kickoff < UTC_TIMESTAMP()';
 		$show_predictions = get_option($this->prefix.'show_predictions', 0);
-		if ($show_predictions || $show_all) {
+		if ($show_predictions) {
 			$throttle = '';
 		}		
 		$sql = "SELECT m.match_id,
@@ -1061,7 +792,7 @@ EOT;
 					h.team_id = m.home_team_id AND a.team_id = m.away_team_id AND (m.is_result OR EXISTS
 						(SELECT * FROM {$wpdb->prefix}{$this->prefix}prediction p WHERE p.match_id = m.match_id) )
 				ORDER BY
-					m.kickoff";
+					m.kickoff DESC";
 					
 		$toprow = @$wpdb->get_results($wpdb->prepare($sql, $match_id, $match_id), OBJECT_K);
 		
@@ -1094,8 +825,16 @@ EOT;
 			'user_id' => -1,
 			'highlight' => 'background:red;font-weight:bold'
 		), $atts));
-		
+                
 		global $wpdb;
+                
+                $current_user = wp_get_current_user();
+                if( 0 == $current_user->ID ){
+                    $login_url = wp_login_url( get_permalink() );
+                    $register_url = esc_url(add_query_arg(array('action' => 'register'), $login_url));
+                    $this->setMessage(sprintf(__('Please <a href="%1$s">login</a> or <a href="%2$s">register</a> to make a prediction', FP_PD), $login_url, $register_url),false);
+                    return $this->printMessage(false);
+                }		
 	
 		ob_start();
 		$output = '';
@@ -1167,7 +906,14 @@ EOT;
 		return $output;
 	}	
 	
-	function user_predictions($user = 0, $show_total = 0, $show_result = 0) {
+	/**
+	 * Display predictions of logged in user.
+	 * 
+	 * @param number $show_total - Show the total below the table.
+	 * @param number $show_result - Show the result aside the prediction.
+	 * @return string
+	 */
+	function user_predictions($show_total = 1, $show_result = 1, $max = 0) {
 		
 		global $wpdb;
 		
@@ -1177,9 +923,6 @@ EOT;
 		 * Depending on request, return nice default for widget and shortcode if not logged in.
 		 */
 		if (!is_user_logged_in()) {
-			if (!$user && $show_total) {
-				return "0";
-			}
 			return "";
 		}
 		
@@ -1196,12 +939,8 @@ EOT;
 			$total = $row->total;
 		}
 		
-		/*
-		 * Only want total score, not table.
-		 */
-		if (!$user) {
-			return "$total";
-		}
+		$limit = '';
+		if($max) $limit = "LIMIT $max";
 		
 		$sql = "SELECT is_group,
 			h.name AS home_team_name, a.name AS away_team_name, is_result,
@@ -1219,12 +958,18 @@ EOT;
 			m.home_team_id = h.team_id AND m.away_team_id = a.team_id AND
 			p.user_id = %d
 		ORDER BY
-			sort_order, kickoff";
+			kickoff
+		$limit";
 
 		$result = $wpdb->get_results( $wpdb->prepare($sql, $current_user->ID) , OBJECT );
 		$output .= '<table class="group zebra '.$this->prefix.'user_pred_widget">';
 		$output .= "<tr class='row-header'>";
 		$output .= "<th>".__('Match', FP_PD)."</th>";
+                if ($show_result) {
+			$output .= "<th class='fp-score' title='".__('Results', FP_PD)."'>".__('Res', FP_PD)."</th>";
+		} else {
+			$output .= "<th class='fp-score'>&nbsp;</th>";
+		}
 		$output .= "<th class='column-score'>"._n( 'Prediction', 'Predictions', 1, FP_PD )."</th>";
 		$output .= "<th class='column-points'>".__('Pts', FP_PD)."</th>";
 		$output .= "</tr>";
@@ -1246,7 +991,8 @@ EOT;
 				$apen = '('.$row->away_penalties . ')';
 			}
 			$output .= "<tr class='fp-row'>";
-			$output .= "<td>".$this->unclean($row->home_team_name)." ".__('vs',FP_PD)." ".$this->unclean($row->away_team_name)." $match_result</td>";
+			$output .= "<td>".$this->unclean($row->home_team_name)." ".__('vs',FP_PD)." ".$this->unclean($row->away_team_name)."</td>";
+                        $output .= "<td class='fp-score'>$match_result</td>";
 			$output .= "<td class='column-score'>$row->home_goals{$hpen}&nbsp;&ndash;&nbsp;$row->away_goals{$apen}</td>";
 			if ($row->is_result) {
 				$output .= "<td class='column-points'>$row->points</td>";
@@ -1258,7 +1004,7 @@ EOT;
 		
 		if ($show_total) {
 			$output .= "<tr>";
-			$output .= "<th colspan='2'>".__('Total', FP_PD)."</th>";
+			$output .= "<th colspan='3'>".__('Total', FP_PD)."</th>";
 			$output .= "<th class='column-points'>$total</th>";
 			$output .= "</tr>";
 		}
@@ -1267,23 +1013,168 @@ EOT;
 		
 		return $output;
 	}
+        
+        /**
+	 * Display logged user predictions in a widget.
+	 *
+	 * @param number $show_result - Show the result aside the prediction.
+	 * @return string
+	 */
+	function widget_predictions($show_result = 1) {
+		
+		global $wpdb;
+//		global $current_user;
+		
+		$output = '';
+		$separator = '&nbsp;';
+		
+		/*
+		 * Depending on request, return nice default for widget and shortcode if not logged in.
+		 */
+		if (!is_user_logged_in()) {
+			return "";
+		}
+		
+		$current_user = wp_get_current_user();
+		
+		$sql = "SELECT is_group,
+			h.name AS home_team_name, a.name AS away_team_name, is_result,
+			p.home_goals, p.away_goals, p.home_penalties, p.away_penalties,
+			m.home_goals AS mhg, m.away_goals AS mag, m.home_penalties AS mhp, m.away_penalties AS map,
+			h.country AS home_country, a.country AS away_country, points
+		FROM 
+			{$wpdb->prefix}{$this->prefix}match m,
+			{$wpdb->prefix}{$this->prefix}prediction p,
+			{$wpdb->prefix}{$this->prefix}stage s,
+			{$wpdb->prefix}{$this->prefix}team h,
+			{$wpdb->prefix}{$this->prefix}team a
+		WHERE
+			m.stage_id = s.stage_id AND p.match_id = m.match_id AND
+			m.home_team_id = h.team_id AND m.away_team_id = a.team_id AND
+			p.user_id = %d AND kickoff < UTC_TIMESTAMP()
+		ORDER BY
+			kickoff DESC
+		LIMIT 5";
+		
+		$last = $wpdb->get_results( $wpdb->prepare($sql, $current_user->ID, $current_user->ID) , OBJECT );
+		$last = array_reverse($last);
+		
+		$sql = "SELECT is_group,
+			h.name AS home_team_name, a.name AS away_team_name, is_result,
+			p.home_goals, p.away_goals, p.home_penalties, p.away_penalties,
+			m.home_goals AS mhg, m.away_goals AS mag, m.home_penalties AS mhp, m.away_penalties AS map,
+			h.country AS home_country, a.country AS away_country, points
+		FROM 
+			{$wpdb->prefix}{$this->prefix}match m,
+			{$wpdb->prefix}{$this->prefix}prediction p,
+			{$wpdb->prefix}{$this->prefix}stage s,
+			{$wpdb->prefix}{$this->prefix}team h,
+			{$wpdb->prefix}{$this->prefix}team a
+		WHERE
+			m.stage_id = s.stage_id AND p.match_id = m.match_id AND
+			m.home_team_id = h.team_id AND m.away_team_id = a.team_id AND
+			p.user_id = %d AND kickoff > UTC_TIMESTAMP()
+		ORDER BY
+			kickoff 
+		LIMIT 5";
+		
+		$next = $wpdb->get_results( $wpdb->prepare($sql, $current_user->ID, $current_user->ID) , OBJECT );
+		$result = array_merge($last, $next);
+		
+		$output .= '<table class="group zebra '.$this->prefix.'user_pred_widget">';
+		$output .= "<tr class='fp-header'>";
+		$output .= "<th>".__('Match', WCP_TD)."</th>";
+		if ($show_result) {
+			$output .= "<th class='fp-score' title='".__('Results', FP_TD)."'>".__('Res', FP_TD)."</th>";
+		} else {
+			$output .= "<th class='fp-score'>&nbsp;</th>";
+		}
+		$output .= "<th class='fp-score' title='".__('Predictions', FP_TD)."'>".__('Pred', FP_TD)."</th>";
+		$output .= "</tr>";
+		foreach ($result as $row) {
+			$hpen = '';
+			$apen = '';
+			$match_result = '-';
+			if ($row->is_result && $show_result) {
+				$mhpen = '';
+				$mapen = '';
+				if (!$row->is_group && ($row->mhp > 0 || $row->map > 0)) { 
+					$mhpen = '('.$row->mhp . ')';
+					$mapen = '('.$row->map . ')';
+				}
+				$match_result = "$row->mhg{$mhpen}&nbsp;$separator&nbsp;$row->mag{$mapen}";
+			}
+			if (!$row->is_group && ($row->home_penalties > 0 || $row->away_penalties > 0)) { 
+				$hpen = '('.$row->home_penalties . ')';
+				$apen = '('.$row->away_penalties . ')';
+			}
+			$output .= "<tr class='fp-row'>";
+			$output .= "<td nowrap>".$this->unclean($row->home_team_name)." $separator ".$this->unclean($row->away_team_name)."</td>";
+			$output .= "<td class='fp-score'>$match_result</td>";
+			$output .= "<td class='fp-score'>$row->home_goals{$hpen}&nbsp;$separator&nbsp;$row->away_goals{$apen}</td>";
+			$output .= "</tr>";
+		}
+		
+		$output .= "</table>";
+		
+		return $output;
+	}
 	
-	function show_user_predictions($atts, $content = null) {
+	function my_points() {
+	
+		global $wpdb;
+//		global $current_user;
+	
+		/*
+		 * Depending on request, return nice default for widget
+		* and shortcode if not logged in.
+		*/
+		if (!is_user_logged_in()) {
+			return "";
+		}
+	
+		$current_user = wp_get_current_user();
+	
+		$total = 0;
+		$sql = "SELECT COALESCE(SUM(points),0) AS total
+		FROM
+		{$wpdb->prefix}{$this->prefix}prediction p
+		WHERE
+		p.user_id = %d";
+			
+		$row = $wpdb->get_row( $wpdb->prepare($sql, $current_user->ID) , OBJECT );
+		$total = $row->total;
+	
+		/*
+		* Only want total score, not table.
+		*/
+		return "$total";
+	}
+	
+	function show_user_predictions($atts, $content = null, $stage = 0) {
 		
 		extract(shortcode_atts(array(
-			'user' => '', 
-			'show_total' => 1
+			'user' => '',
+			'show_total' => 1,
+			'playoff' => 0
 		), $atts));
 		
 		global $wpdb;
                 
 		$current_user = wp_get_current_user();
                 if( 0 == $current_user->ID ){
-                    die('Error');
+                    $login_url = wp_login_url( get_permalink() );
+                    $register_url = esc_url(add_query_arg(array('action' => 'register'), $login_url));
+                    $this->setMessage(sprintf(__('Please <a href="%1$s">login</a> or <a href="%2$s">register</a> to make a prediction', FP_PD), $login_url, $register_url),false);
+                    return $this->printMessage(false);
                 }
 		
 		ob_start();
 		$output = '';
+                $stage_filter = '';
+		if ($playoff) $stage_filter = "AND is_group = 0";
+		if ($stage) $stage_filter = "AND m.stage_id = $stage";
+                
 		$output .= '<a class="predictions-link" href="javascript:history.go(-1)"><h6>'.__('Back', FP_PD).'</h6></a>' . PHP_EOL;
 				
 		$total = 0;
@@ -1291,9 +1182,11 @@ EOT;
 			$sql = "SELECT display_name, COALESCE(SUM(points),0) AS total
 					FROM
 						{$wpdb->prefix}{$this->prefix}prediction p,
-						{$wpdb->users} u
+						{$wpdb->users} u,
+						{$wpdb->prefix}{$this->prefix}match m,
+						{$wpdb->prefix}{$this->prefix}stage s
 					WHERE
-						p.user_id = %d AND p.user_id = u.ID";
+						p.user_id = %d AND p.user_id = u.ID AND p.match_id = m.match_id AND m.stage_id = s.stage_id $stage_filter";
 			
 			$row = $wpdb->get_row( $wpdb->prepare($sql, $user) , OBJECT );
 			$display_name = $row->display_name;
@@ -1320,15 +1213,16 @@ EOT;
 		WHERE
 			m.stage_id = s.stage_id AND p.match_id = m.match_id AND
 			m.home_team_id = h.team_id AND m.away_team_id = a.team_id AND
-			p.user_id = %d $throttle
+			p.user_id = %d $throttle $stage_filter
 		ORDER BY
-			sort_order, kickoff";
+			kickoff DESC";
 		
 		$result = $wpdb->get_results( $wpdb->prepare($sql, $user) , OBJECT );
 		$output .= '<h6>' . $display_name . '</h6>';
 		$output .= '<table class="group zebra '.$this->prefix.'user_pred_widget">';
 		$output .= "<tr class='row-header'>";
 		$output .= "<th>".__('Match', FP_PD)."</th>";
+		$output .= "<th class='column-score'>"._n( 'Result', 'Results', 1, FP_PD )."</th>";
 		$output .= "<th class='column-score'>"._n( 'Prediction', 'Predictions', 1, FP_PD )."</th>";
 		$output .= "<th class='column-points'>".__('Pts', FP_PD)."</th>";
 		$output .= "</tr>";
@@ -1336,7 +1230,7 @@ EOT;
 			$hpen = '';
 			$apen = '';
 			$match_result = '';
-			if ($row->is_result && $show_result) {
+			if ($row->is_result) {
 				$mhpen = '';
 				$mapen = '';
 				if (!$row->is_group && ($row->mhp > 0 || $row->map > 0)) { 
@@ -1350,8 +1244,9 @@ EOT;
 				$apen = '('.$row->away_penalties . ')';
 			}
 			$output .= "<tr class='fp-row'>";
-			$output .= "<td>".$this->unclean($row->home_team_name)." ".__('vs',FP_PD)." ".$this->unclean($row->away_team_name)." $match_result</td>";
-			$output .= "<td class='column-score'>$row->home_goals{$hpen}&nbsp;&ndash;&nbsp;$row->away_goals{$apen}</td>";
+			$output .= "<td>".$this->unclean($row->home_team_name)." ".__('vs',FP_PD)." ".$this->unclean($row->away_team_name)."</td>";
+			$output .= "<td class='column-score'>$match_result</td>";
+                        $output .= "<td class='column-score'>$row->home_goals{$hpen}&nbsp;&ndash;&nbsp;$row->away_goals{$apen}</td>";
 			if ($row->is_result) {
 				$output .= "<td class='column-points'>$row->points</td>";
 			} else {
@@ -1362,7 +1257,7 @@ EOT;
 		
 		if ($show_total) {
 			$output .= "<tr>";
-			$output .= "<th colspan='2'>".__('Total', FP_PD)."</th>";
+			$output .= "<th colspan='3'>".__('Total', FP_PD)."</th>";
 			$output .= "<th class='column-points'>$total</th>";
 			$output .= "</tr>";
 		}

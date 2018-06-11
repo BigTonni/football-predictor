@@ -92,6 +92,14 @@ class Football {
 		), $atts));
 		
 		$output = '';
+                
+                $current_user = wp_get_current_user();
+                if( 0 == $current_user->ID ){
+                    $login_url = wp_login_url( get_permalink() );
+                    $register_url = esc_url(add_query_arg(array('action' => 'register'), $login_url));
+                    $this->setMessage(sprintf(__('Please <a href="%1$s">login</a> or <a href="%2$s">register</a> to make a prediction', FP_PD), $login_url, $register_url),false);
+                    return $this->printMessage(false);
+                }
 		
 		if (!is_numeric($stage)) {
 			$stage = 0;

@@ -47,7 +47,7 @@ class FootballPredict extends Football {
 			
 			$login_url = wp_login_url( get_permalink() );
 			$register_url = esc_url(add_query_arg(array('action' => 'register'), $login_url));
-			$this->setMessage(sprintf(__('Please <a href="%1$s">login</a> or <a href="%2$s">register</a> to make a prediction', FP_PD), $login_url, $register_url),false);
+			return $this->setMessage(sprintf(__('Please <a href="%1$s">login</a> or <a href="%2$s">register</a> to make a prediction', FP_PD), $login_url, $register_url),false);
 			$disabled = ' disabled ';			
 		}
 		
@@ -56,7 +56,7 @@ class FootballPredict extends Football {
 		 */
 		if ($logged_in && isset($_POST[$this->prefix.'save'])) {
 			if (isset($_POST['match'])) {
-				$match = sanitize_text_field($_POST['match']);
+				$match = $_POST['match'];
 			}
 			$ret = $this->save_prediction($match);
 		}
@@ -224,7 +224,6 @@ class FootballPredict extends Football {
 		foreach ($match as $key=>$m) {
 			$match[$key] = array_map('trim', $m);
 		}
-		
 		/**
 		 * Validate, both home and away scores must be present or both blank.
 		 */
@@ -346,17 +345,16 @@ class FootballPredict extends Football {
 	 * Save via AJAX
 	 */
 	function ajax() {
-            
                 $current_user = wp_get_current_user();
                 if( 0 == $current_user->ID ){
                     die('Error');
                 }
-		
+	
 		$match = array();
-		
+			
 		if (isset($_POST['match'])) {
 		
-			$match = sanitize_text_field($_POST['match']);
+			$match = $_POST['match'];
 			$this->save_prediction($match);
 		} else {
 			$this->setMessage(__('No data to save', FP_PD), true);
@@ -379,7 +377,7 @@ class FootballPredict extends Football {
 			if (isset($setting['results'])) $show_result = $setting['results'];
 		}
 		$ret = array('notice' => $this->printMessage(false), 'preds' => $r->user_predictions(1, $show_total, $show_result));
-		
+	
 		die(json_encode($ret));
 	}
 	

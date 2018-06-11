@@ -3,7 +3,7 @@
  * Plugin Name: Football Predictor
  * Plugin URI: https://wordpress.org/plugins/football-predictor/
  * Description: To manage and perform a marvel football competition for the FIFA World Cup 2018.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Anton Shulga
  * Author URI: https://github.com/BigTonni
  * Text Domain: football-predictor
@@ -40,7 +40,7 @@ if (!defined('FP_ABSPATH')) {
     define('FP_ABSPATH', dirname(FP_FILE) . '/');
 }
 if (!defined('FP_VERSION')) {
-    define('FP_VERSION', '1.0.2');
+    define('FP_VERSION', '1.0.3');
 }
 if (!defined('FP_PREFIX')) {
     define('FP_PREFIX', 'fp_');

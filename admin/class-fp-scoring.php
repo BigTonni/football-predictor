@@ -78,7 +78,7 @@ class FootballScoring extends FootballAdmin {
 		
 		if (isset($_POST[$this->prefix.'savescore'])) {
 			check_admin_referer($this->prefix . 'scoring-form');
-			$scoring = sanitize_text_field($_POST['scoring']);
+			$scoring = $_POST['scoring'];
 			$valid = true;
 			foreach ($scoring as $key=>$value) {
 				if (!is_numeric($value)) {
@@ -162,12 +162,12 @@ class FootballScoring extends FootballAdmin {
 		$user_id = -1;
 		
 		if (isset($_POST['filter_match'])) {
-			$match_id = sanitize_text_field($_POST['filter_match']);
+			$match_id = $_POST['filter_match'];
 			$this->selectTab(2);
 		}
 		
 		if (isset($_POST['filter_user'])) {
-			$user_id = sanitize_text_field($_POST['filter_user']);
+			$user_id = $_POST['filter_user'];
 			$this->selectTab(2);
 		}
 ?>

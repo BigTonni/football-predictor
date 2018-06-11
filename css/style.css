@@ -204,3 +204,7 @@ table.knockout {
 	text-align: center;
 	margin-bottom:10px;
 }
+.predictor input[type="text"]{
+    background: #fff;
+}
+.entry-content .message.updated{display: block;}

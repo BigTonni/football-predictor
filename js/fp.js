@@ -110,17 +110,18 @@ jQuery(document).ready(function($) {
 	$('form.fp_user_form').submit(function() {
 		var data = $(this).serialize();
 		var msg_id = $(this).find("input[name='msg_id']");  // get element id for message
-		
+
 		$.ajax({
 			type:"POST",
-			cache:false,
 			url: FPScript.ajax_url,
 			dataType:"json",
 			data:"action=footballpredictor_ajax&"+data,
 			success: function(msg){
 				// Using the hidden field for this form display message and scroll
 				$('#'+msg_id.val()).html(msg.notice);
-				$('.fp_user_pred_widget').replaceWith(msg.preds);
+                                if($('.fp_user_pred_widget').length > 0){
+                                    $('.fp_user_pred_widget').replaceWith(msg.preds);
+                                }
 				$('html, body').animate({scrollTop: $('#'+msg_id.val()).offset().top}, 500);
 			},
 			error: function(xml, text, error) {

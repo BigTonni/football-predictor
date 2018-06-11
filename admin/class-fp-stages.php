@@ -75,7 +75,7 @@ class FootballStages extends FootballAdmin {
 		 * the form.
 		 */
 		if (isset($_GET['modifystage_id'])) {
-			$stage_id = sanitize_text_field($_GET['modifystage_id']);
+			$stage_id = $_GET['modifystage_id'];
 			$row = $this->get($stage_id);
 			if (empty($row)) $stage_id = -1;	// Didn't find row. Prevent modification
 			extract($row, EXTR_IF_EXISTS);

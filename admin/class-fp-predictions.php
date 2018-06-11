@@ -83,7 +83,7 @@ class FootballPredictions extends FootballAdmin {
 		 * the form.
 		 */
 		if (isset($_GET['modifyprediction_id'])) {
-			$prediction_id = sanitize_text_field($_GET['modifyprediction_id']);
+			$prediction_id = $_GET['modifyprediction_id'];
 			$row = $this->get($prediction_id);
 			if (empty($row)) $prediction_id = -1;	// Didn't find row. Prevent modification
 			extract($row, EXTR_IF_EXISTS);
