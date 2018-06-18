@@ -64,9 +64,9 @@ class FootballReport extends Football {
 			$output = "<table class='group zebra'>
 			<tr><th colspan='8'><h3>$stage_name</h3></th></tr>
 			<tr class='row-header'>
-				<th class='column-team'>$team</th>
-				<th class='column-goal'><span title='$p_l'>$p</span></th>
-				<th class='column-goal'><span title='$gd_l'>$gd</span></th>
+				<th class='fp-team'>$team</th>
+				<th class='fp-goal'><span title='$p_l'>$p</span></th>
+				<th class='fp-goal'><span title='$gd_l'>$gd</span></th>
 			</tr>";
 			
 		} else {
@@ -74,14 +74,14 @@ class FootballReport extends Football {
 			$output = "<table class='group zebra'>
 			<tr><th colspan='8'><h3>$stage_name</h3></th></tr>
 			<tr class='row-header'>
-				<th class='column-team'>$team</th>
-				<th class='column-goal'><span title='$mp_l'>$mp</span></th>
-				<th class='column-goal'><span title='$w_l'>$w</span></th>
-				<th class='column-goal'><span title='$d_l'>$d</span></th>
-				<th class='column-goal'><span title='$l_l'>$l</span></th>
-				<th class='column-goal'><span title='$gf_l'>$gf</span></th>
-				<th class='column-goal'><span title='$ga_l'>$ga</span></th>
-				<th class='column-goal'><span title='$p_l'>$p</span></th>
+				<th class='fp-team'>$team</th>
+				<th class='fp-goal'><span title='$mp_l'>$mp</span></th>
+				<th class='fp-goal'><span title='$w_l'>$w</span></th>
+				<th class='fp-goal'><span title='$d_l'>$d</span></th>
+				<th class='fp-goal'><span title='$l_l'>$l</span></th>
+				<th class='fp-goal'><span title='$gf_l'>$gf</span></th>
+				<th class='fp-goal'><span title='$ga_l'>$ga</span></th>
+				<th class='fp-goal'><span title='$p_l'>$p</span></th>
 			</tr>";			
 		}
 		
@@ -96,22 +96,22 @@ class FootballReport extends Football {
 		if($compact == true) {
 		
 			$output = "<tr class='fp-row'>
-				<td class='column-team'>$flag $name</td>
-				<td class='column-goal'>$row->points</td>
-				<td class='column-goal'>$gd</td>
+				<td class='fp-team'>$flag $name</td>
+				<td class='fp-goal'>$row->points</td>
+				<td class='fp-goal'>$gd</td>
 			</tr>";
 			
 		} else {
 			
 			$output = "<tr class='fp-row'>
-				<td class='column-team'>$flag $name</td>
-				<td class='column-goal'>$row->played</td>
-				<td class='column-goal'>$row->won</td>
-				<td class='column-goal'>$row->drawn</td>
-				<td class='column-goal'>$row->lost</td>
-				<td class='column-goal'>$row->gf</td>
-				<td class='column-goal'>$row->ga</td>
-				<td class='column-goal'>$row->points</td>
+				<td class='fp-team'>$flag $name</td>
+				<td class='fp-goal'>$row->played</td>
+				<td class='fp-goal'>$row->won</td>
+				<td class='fp-goal'>$row->drawn</td>
+				<td class='fp-goal'>$row->lost</td>
+				<td class='fp-goal'>$row->gf</td>
+				<td class='fp-goal'>$row->ga</td>
+				<td class='fp-goal'>$row->points</td>
 			</tr>";		
 		}
 		
@@ -275,7 +275,7 @@ class FootballReport extends Football {
 	 * 
 	 * Sort by group sort order (keep groups together), then points, then matches played, then,
 	 * 
-	 * From http://en.wikipedia.org/wiki/2010_FIFA_World_Cup#Group_stage
+	 * From http://en.wikipedia.org/wiki/2014_FIFA_World_Cup#Group_stage
 	 * 
 	 * Tie-breaking criteria
 	 * 
@@ -525,7 +525,7 @@ class FootballReport extends Football {
 		
 		$result = $wpdb->get_results( $sql , OBJECT );
 		
-		if ($result) $output .= '<table style="table-layout:fixed;margin-top:1em;width:'.$width.'" class="predictor">' .PHP_EOL;
+		if ($result) $output .= '<table style="width:'.$width.'" class="predictor">' .PHP_EOL;
 		
 		foreach ($result as $row) {
 			$output .= '<tr><td class="l">'.$this->team_name($row, true);
@@ -613,7 +613,7 @@ class FootballReport extends Football {
 	}	
 	
 	/**
-	 * Display a ranking table of all predictions for all matches
+	 * Display a ranking table of all predictions for all matches.
 	 * 
 	 * @param integer $limit - Limit the number of users to show.
 	 * @param string $avatar - Show the avatar of player.
@@ -658,7 +658,7 @@ class FootballReport extends Football {
 				LIMIT %d";
 					
 		$result = $wpdb->get_results($wpdb->prepare($sql, $limit));
-		$output .= "<table class='group zebra'><tr class='row-header'><th class='column-user'>".__('User', FP_PD)."</th><th class='column-goal'>".__('Points', FP_PD)."</th><th class='column-goal'>&nbsp;</th></tr>" . PHP_EOL;
+		$output .= "<table class='group zebra'><tr class='fp-header'><th class='fp-user'>".__('User', FP_PD)."</th><th class='fp-goal' title='".__('Points', FP_PD)."'>".__('Points', FP_PD)."</th><th class='fp-review'>&nbsp;</th></tr>" . PHP_EOL;
 		$pos = 1;
 		$count = 1;
 		$oldTotal = -1;
@@ -673,7 +673,7 @@ class FootballReport extends Football {
 			} else {
 				$style = 'class="fp-row"';
 			}
-			$output .= "<tr $style><td class='column-user'>".($avatar ? get_avatar( $row->ID, '16', '', $row->display_name ) : '').' '.$row->display_name."</td><td class='column-goal'>$row->total</td><td class='column-goal'>";
+			$output .= "<tr $style><td class='fp-user'>".($avatar ? get_avatar( $row->ID, '16', '', $row->display_name ) : '').' '. $pos . '. ' . $row->display_name."</td><td class='fp-points'>$row->total</td><td class='fp-review'>";
 			
                         $oldTotal = $row->total;
                         
@@ -681,7 +681,7 @@ class FootballReport extends Football {
 				$stage_link = '';
 				if ($playoff) $stage_link = '&playoff=1';
 				if ($stage) $stage_link = '&stage=1';
-				$output .= "<a class='ranking-link' title='".__('Predictions', FP_PD)."' href=\"".get_option($this->prefix.'user_predictions')."&fp=predictions&user=".$row->ID."\"><img src='". WP_PLUGIN_URL."/".FP_PD ."/images/predictions.png' /></a>";
+				$output .= "<a class='review-link' title='".__('Predictions', FP_PD)."' href=\"".get_option($this->prefix.'user_predictions')."&fp=predictions&user=".$row->ID."$stage_link\"><img src='". WP_PLUGIN_URL."/".FP_PD ."/images/predictions.png' /></a>";
 			}			
 					
 			$output .= "</td></tr>" . PHP_EOL;
@@ -726,12 +726,12 @@ class FootballReport extends Football {
 				$style = 'class="fp-row"';
 			}
 			$output .= "<tr $style>";
-			$output .= "<td class='column-user'>".($avatar ? get_avatar( $row->ID, '16', '', $row->display_name ) : '').' '.$row->display_name."</td>";
-			$output .= "<td class='column-score'>$row->home_goals{$hpen}&ndash;$row->away_goals{$apen}</td>";
+			$output .= "<td class='fp-user'>".($avatar ? get_avatar( $row->ID, '16', '', $row->display_name ) : '').' '.$row->display_name."</td>";
+			$output .= "<td class='fp-score'>$row->home_goals{$hpen}&ndash;$row->away_goals{$apen}</td>";
 			if ($is_result) {
-				$output .= "<td class='column-points'>$row->points</td>";
+				$output .= "<td class='fp-points'>$row->points</td>";
 			} else {
-				$output .= "<td class='column-points'>&ndash;</td>";
+				$output .= "<td class='fp-points'>&ndash;</td>";
 			}
 			$output .= "</tr>";
 		}
@@ -802,7 +802,7 @@ class FootballReport extends Football {
 			$i = 1;
 			foreach ($toprow as $key=>$row) {
 				
-				$output .= "<tr class='row-header'><th nowrap class='l'>".$this->team_name($row, true).' '. $this->team_score($row, true)."&ndash;".$this->team_score($row, false).' '. $this->team_name($row, false)."</th><th class='column-score'>".__('Prediction', FP_PD)."</th><th class='column-points'>".__('Pts', FP_PD)."</th></tr>";
+				$output .= "<tr class='row-header'><th nowrap class='l'>".$this->team_name($row, true).' '. $this->team_score($row, true)."&ndash;".$this->team_score($row, false).' '. $this->team_name($row, false)."</th><th class='fp-score'>".__('Prediction', FP_PD)."</th><th class='fp-points'>".__('Points', FP_PD)."</th></tr>";
 	
 				$output .= $this->score_match($key, $limit, $highlight, $curr_user_id, $filter_user, $avatar, $row->is_group, $row->is_result);
 				
@@ -888,7 +888,7 @@ class FootballReport extends Football {
 			$i = 1;
 			foreach ($toprow as $key=>$row) {
 				
-				$output .= "<tr class='row-header'><th nowrap class='l'>".$this->team_name($row, true).' '. $this->team_score($row, true)."&ndash;".$this->team_score($row, false).' '. $this->team_name($row, false)."</th><th class='column-score'>".__('Prediction', FP_PD)."</th><th class='column-points'>".__('Pts', FP_PD)."</th></tr>";
+				$output .= "<tr class='row-header'><th nowrap class='l'>".$this->team_name($row, true).' '. $this->team_score($row, true)."&ndash;".$this->team_score($row, false).' '. $this->team_name($row, false)."</th><th class='fp-score'>".__('Prediction', FP_PD)."</th><th class='fp-points'>".__('Points', FP_PD)."</th></tr>";
 	
 				$output .= $this->score_match($key, $limit, $highlight, $curr_user_id, $filter_user, $avatar, $row->is_group, $row->is_result);
 				
@@ -970,8 +970,8 @@ class FootballReport extends Football {
 		} else {
 			$output .= "<th class='fp-score'>&nbsp;</th>";
 		}
-		$output .= "<th class='column-score'>"._n( 'Prediction', 'Predictions', 1, FP_PD )."</th>";
-		$output .= "<th class='column-points'>".__('Pts', FP_PD)."</th>";
+		$output .= "<th class='fp-score'>"._n( 'Prediction', 'Predictions', 1, FP_PD )."</th>";
+		$output .= "<th class='fp-points'>".__('Points', FP_PD)."</th>";
 		$output .= "</tr>";
 		foreach ($result as $row) {
 			$hpen = '';
@@ -993,11 +993,11 @@ class FootballReport extends Football {
 			$output .= "<tr class='fp-row'>";
 			$output .= "<td>".$this->unclean($row->home_team_name)." ".__('vs',FP_PD)." ".$this->unclean($row->away_team_name)."</td>";
                         $output .= "<td class='fp-score'>$match_result</td>";
-			$output .= "<td class='column-score'>$row->home_goals{$hpen}&nbsp;&ndash;&nbsp;$row->away_goals{$apen}</td>";
+			$output .= "<td class='fp-score'>$row->home_goals{$hpen}&nbsp;&ndash;&nbsp;$row->away_goals{$apen}</td>";
 			if ($row->is_result) {
-				$output .= "<td class='column-points'>$row->points</td>";
+				$output .= "<td class='fp-points'>$row->points</td>";
 			} else {
-				$output .= "<td class='column-points'>&ndash;</td>";
+				$output .= "<td class='fp-points'>&ndash;</td>";
 			}
 			$output .= "</tr>";
 		}
@@ -1005,7 +1005,7 @@ class FootballReport extends Football {
 		if ($show_total) {
 			$output .= "<tr>";
 			$output .= "<th colspan='3'>".__('Total', FP_PD)."</th>";
-			$output .= "<th class='column-points'>$total</th>";
+			$output .= "<th class='fp-points'>$total</th>";
 			$output .= "</tr>";
 		}
 		
@@ -1026,7 +1026,7 @@ class FootballReport extends Football {
 //		global $current_user;
 		
 		$output = '';
-		$separator = '&nbsp;';
+		$separator = '&ndash;';
 		
 		/*
 		 * Depending on request, return nice default for widget and shortcode if not logged in.
@@ -1056,7 +1056,7 @@ class FootballReport extends Football {
 			kickoff DESC
 		LIMIT 5";
 		
-		$last = $wpdb->get_results( $wpdb->prepare($sql, $current_user->ID, $current_user->ID) , OBJECT );
+		$last = $wpdb->get_results( $wpdb->prepare($sql,$current_user->ID) , OBJECT );
 		$last = array_reverse($last);
 		
 		$sql = "SELECT is_group,
@@ -1078,18 +1078,18 @@ class FootballReport extends Football {
 			kickoff 
 		LIMIT 5";
 		
-		$next = $wpdb->get_results( $wpdb->prepare($sql, $current_user->ID, $current_user->ID) , OBJECT );
+		$next = $wpdb->get_results( $wpdb->prepare($sql, $current_user->ID) , OBJECT );
 		$result = array_merge($last, $next);
 		
 		$output .= '<table class="group zebra '.$this->prefix.'user_pred_widget">';
 		$output .= "<tr class='fp-header'>";
-		$output .= "<th>".__('Match', WCP_TD)."</th>";
+		$output .= "<th>".__('Match', FP_PD)."</th>";
 		if ($show_result) {
-			$output .= "<th class='fp-score' title='".__('Results', FP_TD)."'>".__('Res', FP_TD)."</th>";
+			$output .= "<th class='fp-score' title='".__('Results', FP_PD)."'>".__('Res', FP_PD)."</th>";
 		} else {
 			$output .= "<th class='fp-score'>&nbsp;</th>";
 		}
-		$output .= "<th class='fp-score' title='".__('Predictions', FP_TD)."'>".__('Pred', FP_TD)."</th>";
+		$output .= "<th class='fp-score' title='".__('Predictions', FP_PD)."'>".__('Pred', FP_PD)."</th>";
 		$output .= "</tr>";
 		foreach ($result as $row) {
 			$hpen = '';
@@ -1222,9 +1222,9 @@ class FootballReport extends Football {
 		$output .= '<table class="group zebra '.$this->prefix.'user_pred_widget">';
 		$output .= "<tr class='row-header'>";
 		$output .= "<th>".__('Match', FP_PD)."</th>";
-		$output .= "<th class='column-score'>"._n( 'Result', 'Results', 1, FP_PD )."</th>";
-		$output .= "<th class='column-score'>"._n( 'Prediction', 'Predictions', 1, FP_PD )."</th>";
-		$output .= "<th class='column-points'>".__('Pts', FP_PD)."</th>";
+		$output .= "<th class='fp-score'>"._n( 'Result', 'Results', 1, FP_PD )."</th>";
+		$output .= "<th class='fp-score'>"._n( 'Prediction', 'Predictions', 1, FP_PD )."</th>";
+		$output .= "<th class='fp-points'>".__('Points', FP_PD)."</th>";
 		$output .= "</tr>";
 		foreach ($result as $row) {
 			$hpen = '';
@@ -1245,12 +1245,12 @@ class FootballReport extends Football {
 			}
 			$output .= "<tr class='fp-row'>";
 			$output .= "<td>".$this->unclean($row->home_team_name)." ".__('vs',FP_PD)." ".$this->unclean($row->away_team_name)."</td>";
-			$output .= "<td class='column-score'>$match_result</td>";
-                        $output .= "<td class='column-score'>$row->home_goals{$hpen}&nbsp;&ndash;&nbsp;$row->away_goals{$apen}</td>";
+			$output .= "<td class='fp-score'>$match_result</td>";
+                        $output .= "<td class='fp-score'>$row->home_goals{$hpen}&nbsp;&ndash;&nbsp;$row->away_goals{$apen}</td>";
 			if ($row->is_result) {
-				$output .= "<td class='column-points'>$row->points</td>";
+				$output .= "<td class='fp-points'>$row->points</td>";
 			} else {
-				$output .= "<td class='column-points'>&ndash;</td>";
+				$output .= "<td class='fp-points'>&ndash;</td>";
 			}
 			$output .= "</tr>";
 		}
@@ -1258,7 +1258,7 @@ class FootballReport extends Football {
 		if ($show_total) {
 			$output .= "<tr>";
 			$output .= "<th colspan='3'>".__('Total', FP_PD)."</th>";
-			$output .= "<th class='column-points'>$total</th>";
+			$output .= "<th class='fp-points'>$total</th>";
 			$output .= "</tr>";
 		}
 		

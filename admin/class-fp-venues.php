@@ -76,7 +76,7 @@ class FootballVenues extends FootballAdmin {
 		 * the form.
 		 */
 		if (isset($_GET['modifyvenue_id'])) {
-			$venue_id = ($_GET['modifyvenue_id']);
+			$venue_id = $_GET['modifyvenue_id'];
 			$row = $this->get($venue_id);
 			if (empty($row)) $venue_id = -1;	// Didn't find row. Prevent modification
 			extract($row, EXTR_IF_EXISTS);
@@ -308,7 +308,7 @@ class FootballVenues extends FootballAdmin {
 	 * 
 	 * @param $venue_id - Preselect this venue
 	 */
-	function getVenues($venue_id, $empty = true, $id = 'venue_id') {
+	function getVenues($venue_id, $empty = true, $id = 'venue_id', $empty_str = '', $class = '') {
 		
 		global $wpdb;
          
@@ -316,17 +316,17 @@ class FootballVenues extends FootballAdmin {
 		
 		$result = $wpdb->get_results( $sql );
 		
-		$output = '<select name="'.$id.'" id="'.$id.'">';
-		if ($empty) $output .= '<option value = "-1"></option>';
+		$output = '<select name="'.$id.'" id="'.$id.'" class="'.$class.'">';
+		if ($empty) $output .= '<option value = "-1">'.$empty_str.'</option>';
 		
 		foreach ($result as $row) {
-			$output .= "<option ";
+			$output .= '<option ';
 			if (!is_null($id) && $venue_id == $row->venue_id) {
-				$output .= " selected ";
+				$output .= ' selected ';
 			}
-			$output .= "value=\"$row->venue_id\">".$this->unclean($row->venue_name).' - '.$this->unclean($row->stadium)."</option>";
+			$output .= 'value="'.$row->venue_id.'">'.$this->unclean($row->venue_name).' - '.$this->unclean($row->stadium).'</option>';
 		}
-		$output .= "</select>";
+		$output .= '</select>';
 		
 		return $output;
 	}

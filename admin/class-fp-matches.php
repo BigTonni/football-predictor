@@ -114,7 +114,7 @@ class FootballMatches extends FootballAdmin {
 			check_admin_referer($this->prefix . 'list-matches');
 			if (isset($_POST['match_id'])) {
 				foreach ($_POST['match_id'] as $id) {
-					$this->delete( int($id) );
+					$this->delete( $id );
 				}
 				delete_option($this->prefix.'group_stats');  // Clear cache
 				$this->setMessage(__('Changes saved', FP_PD));
@@ -143,11 +143,11 @@ class FootballMatches extends FootballAdmin {
 				</tr>
 				<tr valign="top">
 					<td scope="fp-row"><label for="venue_id"><?php _e( 'Venue', FP_PD ) ?></label></td>
-					<td><?php $venues = new FootballVenues(1); echo $venues->getVenues($venue_id, true, 'venue_id', __('Select Venue', FP_PD)); ?></td>
+					<td><?php $venues = new FootballVenues(3); echo $venues->getVenues($venue_id, true, 'venue_id', __('Select Venue', FP_PD)); ?></td>
 				</tr>
 				<tr valign="top">
 					<td scope="fp-row"><label for="stage_id"><?php _e( 'Stage', FP_PD ) ?></label></td>
-					<td><?php $stages = new FootballStages(2); echo $stages->getStages($stage_id, true, 'stage_id', __('Select Stage', FP_PD)); ?></td>
+					<td><?php $stages = new FootballStages(3); echo $stages->getStages($stage_id, true, 'stage_id', __('Select Stage', FP_PD)); ?></td>
 				</tr>
 				<tr valign="top">
 					<td scope="fp-row"><label for="kickoff"><?php _e( 'Kickoff date time<br/>Must be <strong>UTC</strong>', FP_PD ) ?></label></td>
@@ -213,7 +213,7 @@ class FootballMatches extends FootballAdmin {
 					m.venue_id = v.venue_id AND m.stage_id = s.stage_id AND
 					m.home_team_id = h.team_id AND m.away_team_id = a.team_id
 				ORDER BY
-					sort_order, match_no, kickoff";
+					match_no, kickoff";
 					
 		$result = $wpdb->get_results( $sql , OBJECT ); ?>
                 
@@ -432,7 +432,7 @@ class FootballMatches extends FootballAdmin {
 					m.away_team_id = a.team_id
 					$filter_result
 				ORDER BY
-					sort_order, kickoff";
+					sort_order, kickoff, match_no";
 		
 		$result = $wpdb->get_results( $sql );
 		

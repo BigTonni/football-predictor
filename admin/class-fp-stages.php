@@ -153,9 +153,9 @@ class FootballStages extends FootballAdmin {
 						<tr>
 							<th scope="column"><?php _e('Del', FP_PD) ?></th>
 							<th scope="column"><?php _e('ID', FP_PD) ?></th>
-							<th scope="column"><?php _e('Name', FP_PD) ?></th>
-							<th scope="column"><?php _e('Group', FP_PD) ?></th>
-							<th scope="column"><?php _e('Sort', FP_PD) ?></th>
+							<th scope="column"><?php _e('Stage Name', FP_PD) ?></th>
+							<th scope="column"><?php _e('Group Stage', FP_PD) ?></th>
+							<th scope="column"><?php _e('Sort Order', FP_PD) ?></th>
 							<th scope="column"><?php _e('Last Modified', FP_PD) ?></th>
 						</tr>
 					</thead>
@@ -294,7 +294,7 @@ class FootballStages extends FootballAdmin {
 	 * 
 	 * @param $stage_id - Preselect this stage
 	 */
-	function getStages($stage_id, $empty = true, $id = 'stage_id', $empty_str = '') {
+	function getStages($stage_id, $empty = true, $id = 'stage_id', $empty_str = '', $class = '') {
 		
 		global $wpdb;
 		
@@ -302,18 +302,18 @@ class FootballStages extends FootballAdmin {
 		
 		$result = $wpdb->get_results( $sql );
 		
-		$output = '<select name="'.$id.'" id="'.$id.'">';
+		$output = '<select name="'.$id.'" id="'.$id.'" class="'.$class.'">';
 		if ($empty) $output .= '<option value = "-1">'.$empty_str.'</option>';
 		
 		foreach ($result as $row) {
-			$output .= "<option ";
+			$output .= '<option ';
 			if (!is_null($id) && $stage_id == $row->stage_id) {
-				$output .= " selected ";
+				$output .= ' selected ';
 			}
-			$output .= "value=\"$row->stage_id\">".$this->unclean($row->stage_name)."</option>";
+			$output .= 'value="'.$row->stage_id.'">'.$this->unclean($row->stage_name).'</option>';
 		}
 		
-		$output .= "</select>";
+		$output .= '</select>';
 		
 		return $output;
 	}

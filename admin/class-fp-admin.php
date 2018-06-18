@@ -181,7 +181,7 @@ class FootballAdmin extends Football {
 		
 		global $wpdb;
 		
-		$sql = 'SELECT ID,user_login, display_name FROM '.$wpdb->users;
+		$sql = 'SELECT ID,user_login, display_name FROM ' . $wpdb->users . ' ORDER BY display_name';
 		
 		$users = $wpdb->get_results( $sql , OBJECT );
 		
@@ -204,7 +204,7 @@ class FootballAdmin extends Football {
 	 * Check is [+/-]HH:MM format
 	 */
 	function is_hhmm($s) {
-		return (preg_match ("^[+-]{0,1}([0-9]{2}):([0-9]{2})", $s));
+		return (preg_match("/^[+-]{0,1}([0-9]{2}):([0-9]{2})/", $s));
 	}
 	
 	/*

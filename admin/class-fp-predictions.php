@@ -54,7 +54,7 @@ class FootballPredictions extends FootballAdmin {
 			if ($this->insert($user_id, $match_id, $home_goals, $away_goals, $home_penalties, $away_penalties, $points, $wwhen) !== false) {
 				$user_id = $match_id = -1;
 				$home_goals = $away_goals = $home_penalties = $away_penalties = $points = 0;
-				$wwhen = '2010-01-01 12:00:00';
+				$wwhen = '2018-01-01 12:00:00';
 				$this->setMessage(__('Changes saved', FP_PD));
 			}
 			$this->selectTab($this->tab);
@@ -71,7 +71,7 @@ class FootballPredictions extends FootballAdmin {
 			if ($this->update($prediction_id, $user_id, $match_id, $home_goals, $away_goals, $home_penalties, $away_penalties, $points, $wwhen) !== false) {
 				$user_id = $match_id = -1;
 				$home_goals = $away_goals = $home_penalties = $away_penalties = $points = 0;
-				$wwhen = '2010-01-01 12:00:00';
+				$wwhen = '2018-01-01 12:00:00';
 				$prediction_id = -1;
 				$this->setMessage(__('Changes saved', FP_PD));
 			}
@@ -94,7 +94,7 @@ class FootballPredictions extends FootballAdmin {
 			check_admin_referer($this->prefix . 'list-predictions');
 			if (isset($_POST['prediction_id'])) {
 				foreach ($_POST['prediction_id'] as $id) {
-					$this->delete( int($id) );
+					$this->delete( $id );
 				}
 				$this->setMessage(__('Changes saved', FP_PD));
 			}
@@ -199,7 +199,7 @@ class FootballPredictions extends FootballAdmin {
 					$user_filter $stage_filter $team_filter $match_filter
 				ORDER BY
 					u.display_name, s.sort_order, m.kickoff
-				LIMIT 999";
+				LIMIT 100";
 
 					
 		$result = $wpdb->get_results( $sql , OBJECT );

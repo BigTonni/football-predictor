@@ -49,29 +49,29 @@ table.group tr.fp-row {
 	line-height: 1.7em;
 }
 
-table.group th.column-goal {
+table.group th.fp-goal {
 	width:9%;
 	text-align: center;
 	padding-right: 0.5em;
 	vertical-align: middle;
 }
 
-td.column-goal {
+td.fp-goal {
 	text-align: center;
 	padding-right: 0.5em;
 }
 
-table.group td.column-user {
+table.group td.fp-user {
 	text-align: left;
 	padding-left: 0.5em;
 }
 
-table.group th.column-team {
+table.group td.fp-team {
 	vertical-align: middle;
 	text-align:left;
 }
 
-table.group .column-score {
+table.group .fp-score {
 	text-align:center;
 }
 
@@ -85,7 +85,7 @@ table.group tr.row-header {
 	color:#000;	
 }
 
-table.group .column-points {
+table.group .fp-points {
 	text-align:center;
 	padding-right: 0.5em;
 }
@@ -192,7 +192,7 @@ table.knockout {
 	margin: 0 0 12px;
 }
 
-.column-team a {
+.fp-team a {
 	color: #24890d;
 }
 

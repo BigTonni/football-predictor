@@ -109,7 +109,8 @@ class FootballPredictionsWidget extends WP_Widget {
 		// prints the widget
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
-		$total = $instance['total'];
+		$url = isset($instance['url']) ? $instance['url'] : '';
+		$name = isset($instance['name']) ? $instance['name'] : '';
 		$results = $instance['results'];
 		
 		if(is_user_logged_in()) {
@@ -121,7 +122,11 @@ class FootballPredictionsWidget extends WP_Widget {
 			require_once FP_ABSPATH.'includes/class-fp-reports.php';
 			$r = new FootballReport();
 		
-			echo $r->user_predictions(1, $total, $results);
+			echo $r->widget_predictions($results);
+			
+			if (!empty($url) && !empty($name)) {
+				echo '<p><a href="'.$url.'">'.$name.'</a></p>';
+			}
 		
 			echo $after_widget;
 		}
@@ -132,8 +137,10 @@ class FootballPredictionsWidget extends WP_Widget {
 		$instance = $old_instance;
 		$new_instance = wp_parse_args((array) $new_instance, array( 'title' => ''));
 		$instance['title'] = strip_tags($new_instance['title']);
-		$new_instance = wp_parse_args((array) $new_instance, array( 'total' => 0));
-		$instance['total'] = strip_tags($new_instance['total']);
+		$new_instance = wp_parse_args((array) $new_instance, array( 'avatar' => 0));
+		$instance['url'] = strip_tags($new_instance['url']);
+		$new_instance = wp_parse_args((array) $new_instance, array( 'name' => 'My Predictions'));
+		$instance['name'] = strip_tags($new_instance['name']);
 		$new_instance = wp_parse_args((array) $new_instance, array( 'results' => 0));
 		$instance['results'] = strip_tags($new_instance['results']);
 		return $instance;
@@ -144,17 +151,21 @@ class FootballPredictionsWidget extends WP_Widget {
 		global $wpdb;
 		
 		//widgetform in backend
-		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'total' => 0, 'results' => 0) );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'url' => '', 'name' => 'User Predictions', 'results' => 0) );
 		$title = $instance['title'];
-		$total = $instance['total'];
+		$url = $instance['url'];
+		$name = $instance['name'];
 		$results = $instance['results'];
 ?>
 		<p><?php _e('Display User Predictions.', FP_PD); ?></p>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', FP_PD); ?>
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
 		
-		<p><label for="<?php echo $this->get_field_id('total'); ?>"><?php _e('Show Total:', FP_PD); ?>
-		<input class="widefat" id="<?php echo $this->get_field_id('total'); ?>" name="<?php echo $this->get_field_name('total'); ?>" type="checkbox" value="1" <?php echo $total ? ' checked ' : ''; ?> /></label></p>
+                <p><label for="<?php echo $this->get_field_id('url'); ?>"><?php _e('My predictions page URL:', FP_PD); ?>
+		<input class="widefat" id="<?php echo $this->get_field_id('url'); ?>" name="<?php echo $this->get_field_name('url'); ?>" type="text" value="<?php echo esc_attr($url); ?>" /></label></p>
+		
+		<p><label for="<?php echo $this->get_field_id('name'); ?>"><?php _e('My predictions link name:', FP_PD); ?>
+		<input class="widefat" id="<?php echo $this->get_field_id('name'); ?>" name="<?php echo $this->get_field_name('name'); ?>" type="text" value="<?php echo esc_attr($name); ?>" /></label></p>		
 		
 		<p><label for="<?php echo $this->get_field_id('results'); ?>"><?php _e('Show Results:', FP_PD); ?>
 		<input class="widefat" id="<?php echo $this->get_field_id('results'); ?>" name="<?php echo $this->get_field_name('results'); ?>" type="checkbox" value="1" <?php echo $results ? ' checked ' : ''; ?> /></label></p>
@@ -202,6 +213,61 @@ class FootballStandingsWidget extends WP_Widget {
 		$title = $instance['title'];
 ?>
 		<p><?php _e('Display Football Standings.', FP_PD); ?></p>
+		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', FP_PD); ?>
+		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
+<?php
+	}
+}
+
+class FootballMyPointsWidget extends WP_Widget {
+	
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$widget_ops = array('classname' => 'widget_points_'.FP_PD, 'description' => __('Show the total points of current user', FP_PD) );
+		parent::__construct(FP_PD.'points', __('FP My Points', FP_PD), $widget_ops);
+	}
+
+	function widget($args, $instance) {
+		// prints the widget
+		extract($args);
+		$title = apply_filters('widget_title', $instance['title']);
+
+		if(is_user_logged_in()) {
+			
+			echo $before_widget;
+			if ( $title )
+				echo $before_title . $title . $after_title;
+			
+			require_once(dirname(__FILE__).'/class-fp-reports.php');
+			$r = new FootballReport();
+			
+			printf(__('You currently have %d points', FP_PD), $r->my_points());
+			
+			echo $after_widget;
+		}
+	}
+
+	function update($new_instance, $old_instance) {
+		//save the widget
+		$instance = $old_instance;
+		$new_instance = wp_parse_args((array) $new_instance, array( 'title' => ''));
+		$instance['title'] = strip_tags($new_instance['title']);
+		
+		return $instance;
+	}
+	
+	function form($instance) {
+
+		global $wpdb;
+		
+		//widgetform in backend
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '') );
+		$title = $instance['title'];
+		
+		?>
+		<p><?php _e('Show Total Points.', FP_PD); ?></p>
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', FP_PD); ?>
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
 <?php

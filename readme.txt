@@ -4,7 +4,7 @@ Donate link: https://github.com/BigTonni
 Tags: football, prediction, fantasy football, competition, soccer, fantasy, Russia, world cup, fifa worldcup, sports, game, ranking, fifa2018, post, widget, sidebar
 Requires at least: 4.9.6
 Tested up to: 4.9.6
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 
 To manage and perform a marvel football competition for the FIFA World Cup 2018.
 
@@ -24,6 +24,10 @@ To install the plugin, complete the following steps:
 4. Create or edit a post/page and add the shortcode `[football-predictor]`
 
 == Changelog ==
+= 1.0.4 - 18th Jun 2018 =
+* Fix score and match functions
+* Update styles
+
 = 1.0.3 - 11th Jun 2018 =
 * Fix prediction table
 

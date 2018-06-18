@@ -164,7 +164,7 @@ class FootballTeams extends FootballAdmin {
 						<tr>
 							<th scope="column"><?php _e('Del', FP_PD) ?></th>
 							<th scope="column"><?php _e('ID', FP_PD) ?></th>
-							<th scope="column"><?php _e('Name', FP_PD) ?></th>
+							<th scope="column"><?php _e('Team Name', FP_PD) ?></th>
 							<th scope="column"><?php _e('Flag', FP_PD) ?></th>
 							<th scope="column"><?php _e('Country Code', FP_PD) ?></th>
 							<th scope="column"><?php _e('Group Order', FP_PD) ?></th>
@@ -312,7 +312,7 @@ class FootballTeams extends FootballAdmin {
 	 * 
 	 * @param $team_id - Preselect this team
 	 */
-	function getTeams($team_id, $empty = true, $id = 'team_id', $empty_str='') {
+	function getTeams($team_id, $empty = true, $id = 'team_id', $empty_str = '', $class = '') {
 		
 		global $wpdb;
 		
@@ -320,17 +320,17 @@ class FootballTeams extends FootballAdmin {
 		
 		$result = $wpdb->get_results( $sql );
 		
-		$output = '<select name="'.$id.'" id="'.$id.'">';
+		$output = '<select name="'.$id.'" id="'.$id.'" class="'.$class.'">';
 		if ($empty) $output .= '<option value = "-1">'.$empty_str.'</option>';
 		
 		foreach ($result as $row) {
-			$output .= "<option ";
+			$output .= '<option ';
 			if (!is_null($id) && $team_id == $row->team_id) {
-				$output .= " selected ";
+				$output .= ' selected ';
 			}
-			$output .= "value=\"$row->team_id\">".$this->unclean($row->name)."</option>";
+			$output .= 'value="'.$row->team_id.'">'.$this->unclean($row->name).'</option>';
 		}
-		$output .= "</select>";
+		$output .= '</select>';
 		
 		return $output;
 	}

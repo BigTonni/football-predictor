@@ -27,7 +27,7 @@ class FootballScoring extends FootballAdmin {
 			check_admin_referer($this->prefix . 'list-matches');
 			if (isset($_POST['match_id'])) {
 				foreach ($_POST['match_id'] as $id) {
-					$this->calculate_scores(int($id));
+					$this->calculate_scores($id);
 				}
 			}
 			$this->selectTab(1);
@@ -148,8 +148,6 @@ class FootballScoring extends FootballAdmin {
 				
 			</form>
 
-                        <?php do_action('edit_football_rules'); ?>
-			
 		</div>
 <?php 
 	}
